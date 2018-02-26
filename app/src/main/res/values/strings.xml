@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">where_are_you</string>
+    <string name="app_logo_description">App Logo</string>
+    <string name="email_input_hint">Enter your email</string>
+    <string name="password_input_hint">Enter your password</string>
+    <string name="login_btn_text">Login</string>
+    <string name="need_new_account_btn_text">Need a new Account?</string>
+    <string name="action_settings_text">Settings</string>
+    <string name="action_search_text">Search</string>
+    <string name="action_logout_text">Log out</string>
+    <string name="register_layout_text">Create new Account</string>
+    <string name="register_name_text">Enter your name</string>
+    <string name="register_have_account">Have an Account ?</string>
+    <string name="register_byn_text">Register</string>
+    <string name="password_confirmation_input_hint">Confirm password</string>
+    <string name="settings_name_text">Enter name</string>
+    <string name="settings_submit_btn">Submit</string>
+    <string name="action_setup_back">Back</string>
+    <string name="new_post_btn_hint">Add Post</string>
+    <string name="post_title_hint">Post title</string>
+    <string name="post_desc_hint">Post description</string>
+    <string name="new_post_image_descripion">New post image</string>
+</resources>
