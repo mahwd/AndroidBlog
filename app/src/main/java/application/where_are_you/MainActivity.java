@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -23,10 +24,12 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import application.where_are_you.Adapters.PostListAdapter;
 import application.where_are_you.Model.Post;
 import java.lang.reflect.Array;
-
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,27 +40,38 @@ public class MainActivity extends AppCompatActivity {
     private String user_id;
     private RecyclerView recyclerView;
     private String TAG="birbir";
-    private Post[] posts;
+    private List<Post> posts;
+    private PostListAdapter postListAdapter;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        posts = new ArrayList<>();
         mAuth = FirebaseAuth.getInstance();
         user_id = mAuth.getCurrentUser().getUid();
         firebaseFirestore = FirebaseFirestore.getInstance();
         recyclerView = findViewById(R.id.posts_recycler_view);
         addPostBtn = findViewById(R.id.add_post_btn);
-        Log.d("frara","Name");
+        postListAdapter = new PostListAdapter(posts);
+        recyclerView = findViewById(R.id.posts_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        recyclerView.setAdapter(postListAdapter);
+
+
         firebaseFirestore.collection("Posts").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 if (e!=null) {
-                    Log.d(TAG,"Error: "+ e.getMessage());
+//               Toast.makeText()
                 }
                 for (DocumentSnapshot doc: documentSnapshots) {
                     Post post = new Post(doc.getData());
-
+                    posts.add(post);
+                    postListAdapter.notifyDataSetChanged();
                 }
             }
         });

@@ -20,4 +20,5 @@
     <string name="post_title_hint">Post title</string>
     <string name="post_desc_hint">Post description</string>
     <string name="new_post_image_descripion">New post image</string>
+    <string name="list_post_cover_desc">Cover Image</string>
 </resources>

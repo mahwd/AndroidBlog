@@ -1,5 +1,7 @@
 package application.where_are_you.Model;
 
+import android.util.Log;
+
 import java.util.Map;
 
 /**
@@ -14,10 +16,12 @@ public class Post {
     private String ImageUrl;
 
     public Post(Map<String, Object> data) {
-        this.Title = data.get("title").toString();
-        this.Description = data.get("description").toString();
-        this.UserId = data.get("userId").toString();
-        this.ImageUrl = data.get("imageUrl").toString();
+        Log.d("post: ", data.toString());
+        this.Title = (String) data.get("title");
+        Log.d("post: ", this.Title);
+        this.Description = (String) data.get("description");
+        this.UserId = (String) data.get("user_id");
+        this.ImageUrl = (String) data.get("image_uri");
     }
 
     public String getTitle() {

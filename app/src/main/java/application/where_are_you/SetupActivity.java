@@ -1,5 +1,6 @@
 package application.where_are_you;
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -7,6 +8,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -56,7 +59,8 @@ public class SetupActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
-
+    private boolean is_posting;
+    private UploadTask uploadTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +68,10 @@ public class SetupActivity extends AppCompatActivity {
 
         Toolbar setupToolbar = findViewById(R.id.setupToolbar);
         setSupportActionBar(setupToolbar);
-        getSupportActionBar().setTitle("Account Setup");
-
+        ActionBar mActionBar =  getSupportActionBar();
+        mActionBar.setTitle("Account Setup");
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setDisplayShowHomeEnabled(true);
         firebaseAuth = FirebaseAuth.getInstance();
         user_id = firebaseAuth.getCurrentUser().getUid();
 
@@ -124,9 +130,10 @@ public class SetupActivity extends AppCompatActivity {
                     if (isChanged) {
 
                         user_id = firebaseAuth.getCurrentUser().getUid();
-
+                        is_posting = true;
                         StorageReference image_path = storageReference.child("profile_images").child(user_id + ".jpg");
-                        image_path.putFile(mainImageURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        uploadTask = image_path.putFile(mainImageURI);
+                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
@@ -135,7 +142,7 @@ public class SetupActivity extends AppCompatActivity {
                                     storeFirestore(task, user_name);
 
                                 } else {
-
+                                    is_posting = false;
                                     String error = task.getException().getMessage();
                                     Toast.makeText(SetupActivity.this, "(IMAGE Error) : " + error, Toast.LENGTH_LONG).show();
 
@@ -186,22 +193,22 @@ public class SetupActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.setup_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_setup_back:
-                goDashboard();
-                return true;
-            default:
-                return false;
-        }
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.setup_menu, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.action_setup_back:
+//                goDashboard();
+//                return true;
+//            default:
+//                return false;
+//        }
+//    }
 
     private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name) {
 
@@ -234,7 +241,7 @@ public class SetupActivity extends AppCompatActivity {
                     Toast.makeText(SetupActivity.this, "(FIRESTORE Error) : " + error, Toast.LENGTH_LONG).show();
 
                 }
-
+                is_posting = false;
                 setupProgress.setVisibility(View.INVISIBLE);
 
             }
@@ -277,6 +284,35 @@ public class SetupActivity extends AppCompatActivity {
 
             }
         }
+    }
 
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        if (is_posting){
+            onBackPressed();
+        } else {
+            goDashboard();
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (is_posting) {
+            new AlertDialog.Builder(SetupActivity.this)
+                    .setTitle("Are you sure?")
+                    .setMessage("Upload will be break!")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            uploadTask.cancel();
+                            goDashboard();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
+        }else {
+            goDashboard();
+        }
     }
 }
